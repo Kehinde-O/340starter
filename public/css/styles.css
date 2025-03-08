@@ -1,6 +1,173 @@
-/******* Change Box Model ***************/
-*,
-*:before,
-*:after {
+/* Global styles */
+:root {
+  --primary-color: #00c3ff;
+  --secondary-color: #333;
+  --background-color: #fff;
+}
+
+* {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: url('/images/site/checkerboard.jpg') repeat;
+}
+
+.wrapper,#wrapper {
+  background-color: white;
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 1rem;
+  border: 5px blue solid;
+  border-radius: 10px;
+}
+
+#top-header,.top-header{
+  display:flex;
+  justify-content: space-between;
+  text-decoration: none;
+}
+
+/* Navigation */
+.navigation {
+  background-color: var(--secondary-color);
+  list-style: none;
+  padding: 0.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.navigation a {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem;
+}
+
+.navigation a:hover {
+  background-color: var(--primary-color);
+}
+
+/* Hero section */
+.hero {
+  position: relative;
+  margin: 2rem 0;
+}
+
+.hero-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 1rem;
+  margin: 1rem;
+}
+
+.hero-content h2 {
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
+}
+
+.features {
+  list-style: none;
+  margin-bottom: 1rem;
+}
+
+.own-today-btn {
+  display: inline-block;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.hero-image {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Grid container */
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+@media (min-width: 768px) {
+  .grid-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Reviews */
+.reviews {
+  background-color: var(--background-color);
+  padding: 1rem;
+}
+
+.reviews h2 {
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
+}
+
+.reviews ul {
+  list-style: none;
+}
+
+.reviews li {
+  margin-bottom: 0.5rem;
+}
+
+/* Upgrades */
+.upgrades h2 {
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
+}
+
+.upgrade-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.upgrade-item {
+  text-align: center;
+}
+
+.upgrade-img {
+  background-color: var(--primary-color);
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.upgrade-img img {
+  max-width: 100%;
+  height: auto;
+}
+
+.upgrade-item a {
+  color: var(--secondary-color);
+  text-decoration: none;
+}
+
+/* Responsive design */
+@media (max-width: 767px) {
+  .navigation {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .hero-content {
+    position: relative;
+    margin: 0;
+    background: white;
+  }
+  
+  .upgrade-grid {
+    grid-template-columns: 1fr;
+  }
 }
