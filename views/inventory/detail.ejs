@@ -1,0 +1,140 @@
+<%- include('../partials/head') %>
+
+<%- vehicleHtml %>
+
+<% if (errors) { %>
+  <ul class="notice">
+    <% errors.array().forEach(error => { %>
+      <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<%- include('../partials/footer') %>
+
+<style>
+.vehicle-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.vehicle-container h1 {
+  font-size: 2.5em;
+  color: #333;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.vehicle-detail {
+  display: flex;
+  gap: 40px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 30px;
+}
+
+.vehicle-image {
+  flex: 1;
+  min-width: 300px;
+}
+
+.vehicle-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.vehicle-info {
+  flex: 1;
+  padding: 20px;
+}
+
+.vehicle-info h2 {
+  font-size: 1.8em;
+  color: #333;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #eee;
+}
+
+.detail-item {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: baseline;
+}
+
+.detail-item.description {
+  display: block;
+}
+
+.detail-item h3 {
+  font-size: 1.2em;
+  color: #666;
+  margin-bottom: 5px;
+  min-width: 100px;
+  margin-right: 10px;
+}
+
+.detail-item p {
+  font-size: 1.1em;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+.detail-item .price {
+  font-size: 1.8em;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .vehicle-detail {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .vehicle-image {
+    min-width: auto;
+  }
+
+  .vehicle-info {
+    padding: 20px 0 0 0;
+  }
+
+  .vehicle-container h1 {
+    font-size: 2em;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .vehicle-container {
+    padding: 10px;
+  }
+
+  .vehicle-detail {
+    padding: 15px;
+  }
+
+  .vehicle-container h1 {
+    font-size: 1.8em;
+  }
+
+  .detail-item .price {
+    font-size: 1.5em;
+  }
+
+  .detail-item {
+    flex-direction: column;
+  }
+
+  .detail-item h3 {
+    margin-bottom: 5px;
+  }
+}
+</style> 

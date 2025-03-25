@@ -1,0 +1,61 @@
+<%- include('../partials/head') %>
+
+<div class="error-container">
+    <h1><%= title %></h1>
+    
+    <div class="error-content">
+        <p class="error-message"><%- message %></p>
+        
+        <% if (title.includes('404')) { %>
+            <div class="error-humor">
+                <p>🔍 Looks like this page took a wrong turn at Albuquerque!</p>
+                <p>Maybe try one of the links above, or head back to <a href="/">home</a>?</p>
+            </div>
+        <% } else { %>
+            <div class="error-humor">
+                <p>🔧 Our hamsters are working hard to fix this!</p>
+                <p>In the meantime, why not head back to <a href="/">home</a>?</p>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<style>
+    .error-container {
+        text-align: center;
+        padding: 2rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .error-content {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 2rem;
+        margin-top: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .error-humor {
+        color: #6c757d;
+        font-size: 1.1rem;
+        margin-top: 1.5rem;
+    }
+
+    .error-humor a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .error-humor a:hover {
+        text-decoration: underline;
+    }
+</style>
