@@ -1,6 +1,38 @@
 <%- include('../partials/head') %>
 
-<%- vehicleHtml %>
+<div class="vehicle-container">
+  <h1><%= vehicle.inv_year %> <%= vehicle.inv_make %> <%= vehicle.inv_model %></h1>
+  
+  <div class="vehicle-detail">
+    <div class="vehicle-image">
+      <img src="<%= vehicle.inv_image %>" alt="Image of <%= vehicle.inv_year %> <%= vehicle.inv_make %> <%= vehicle.inv_model %>">
+    </div>
+    
+    <div class="vehicle-info">
+      <h2><%= vehicle.inv_make %> <%= vehicle.inv_model %> Details</h2>
+      
+      <div class="detail-item">
+        <h3>Price:</h3>
+        <p class="price">$<%= new Intl.NumberFormat('en-US').format(vehicle.inv_price) %></p>
+      </div>
+      
+      <div class="detail-item description">
+        <h3>Description:</h3>
+        <p><%= vehicle.inv_description %></p>
+      </div>
+      
+      <div class="detail-item">
+        <h3>Color:</h3>
+        <p><%= vehicle.inv_color %></p>
+      </div>
+      
+      <div class="detail-item">
+        <h3>Miles:</h3>
+        <p><%= new Intl.NumberFormat('en-US').format(vehicle.inv_miles) %></p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <% if (errors) { %>
   <ul class="notice">

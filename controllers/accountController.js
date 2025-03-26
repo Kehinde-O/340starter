@@ -1,5 +1,6 @@
 const utilities = require("../utilities")
 const accountModel = require("../models/account-model")
+const { comparePassword } = require("../utilities/password-utilities")
 const accountController = {}
 
 /* ****************************************
@@ -38,22 +39,6 @@ accountController.buildRegister = async function(req, res, next) {
 accountController.registerAccount = async function(req, res) {
   let nav = await utilities.getNav()
   const { account_firstname, account_lastname, account_email, account_password } = req.body
-
-  // Check for existing email
-  const emailExists = await accountModel.checkExistingEmail(account_email)
-  if (emailExists) {
-    req.flash("notice", "Email already exists. Please login or use different email")
-    res.status(400).render("account/register", {
-      title: "Registration",
-      nav,
-      errors: null,
-      account_firstname,
-      account_lastname,
-      account_email,
-      footer: true
-    })
-    return
-  }
 
   try {
     const regResult = await accountModel.registerAccount(
@@ -106,18 +91,55 @@ accountController.registerAccount = async function(req, res) {
 *  Process login request
 * *************************************** */
 accountController.accountLogin = async function(req, res) {
-  const { account_email, account_password } = req.body
   let nav = await utilities.getNav()
-  
-  // For now, just redirect back to login view
-  req.flash("notice", "Please check your credentials and try again.")
-  res.render("account/login", {
-    title: "Login",
-    nav,
-    errors: null,
-    account_email,
-    footer: true
-  })
+  const { account_email, account_password } = req.body
+
+  try {
+    const account = await accountModel.getAccountByEmail(account_email)
+    
+    if (!account) {
+      req.flash("notice", "Please check your credentials and try again.")
+      res.status(400).render("account/login", {
+        title: "Login",
+        nav,
+        errors: null,
+        account_email,
+        footer: true
+      })
+      return
+    }
+
+    const passwordMatch = await comparePassword(account_password, account.account_password)
+
+    if (passwordMatch) {
+      // Store user data in session
+      req.session.account_data = {
+        account_id: account.account_id,
+        account_firstname: account.account_firstname,
+        account_type: account.account_type,
+      }
+      res.redirect("/account/")
+    } else {
+      req.flash("notice", "Please check your credentials and try again.")
+      res.status(400).render("account/login", {
+        title: "Login",
+        nav,
+        errors: null,
+        account_email,
+        footer: true
+      })
+    }
+  } catch (error) {
+    console.error("Login error:", error)
+    req.flash("notice", "Sorry, there was an error processing the login.")
+    res.status(500).render("account/login", {
+      title: "Login",
+      nav,
+      errors: null,
+      account_email,
+      footer: true
+    })
+  }
 }
 
 module.exports = accountController 

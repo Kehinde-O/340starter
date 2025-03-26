@@ -8,6 +8,14 @@
 
 <%- messages() %>
 
+<% if (errors) { %>
+  <ul class="notice">
+    <% errors.array().forEach(error => { %>
+      <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
 <div class="login-container">
   <form id="loginForm" action="/account/login" method="post">
     <div class="form-group">
@@ -19,6 +27,7 @@
         required
         maxlength="100"
         title="Please enter a valid email address"
+        value="<%= locals.account_email %>"
       >
     </div>
     <div class="form-group">
@@ -29,22 +38,10 @@
           id="password" 
           name="account_password" 
           required
-          pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
-          title="Password must be at least 12 characters long, contain at least one number, one uppercase letter, one lowercase letter, one special character, and no spaces"
-          minlength="12"
           maxlength="255"
         >
         <button type="button" class="show-password" onclick="togglePassword('password', this)">Show Password</button>
       </div>
-    </div>
-    <div class="form-group">
-      <% if (errors) { %>
-        <ul class="notice">
-          <% errors.array().forEach(error => { %>
-            <li><%= error.msg %></li>
-          <% }) %>
-        </ul>
-      <% } %>
     </div>
     <div class="form-group">
       <input type="submit" value="LOGIN" class="login-btn">
@@ -121,21 +118,6 @@
   background-color: #f0f0f0;
 }
 
-.password-requirements {
-  font-size: 0.9em;
-  margin-top: 0.5rem;
-  color: #ddd;
-}
-
-.password-requirements ul {
-  margin-top: 0.25rem;
-  padding-left: 1.5rem;
-}
-
-.password-requirements li {
-  margin-bottom: 0.25rem;
-}
-
 .login-btn {
   width: auto;
   padding: 0.75rem 2rem;
@@ -168,6 +150,23 @@
 
 .login-footer a:hover {
   text-decoration: none;
+}
+
+.notice {
+  background-color: #ff6b6b;
+  color: white;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  list-style-type: none;
+}
+
+.notice li {
+  margin-bottom: 0.5rem;
+}
+
+.notice li:last-child {
+  margin-bottom: 0;
 }
 
 @media (max-width: 480px) {

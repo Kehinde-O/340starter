@@ -1,0 +1,173 @@
+<%- include('../partials/head') %>
+
+<% if (title) { %>
+  <h1><%= title %></h1>
+<% } else {
+  res.redirect('/')
+} %>
+
+<%- messages() %>
+
+<% if (errors) { %>
+  <ul class="notice">
+    <% errors.array().forEach(error => { %>
+      <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<div class="form-container">
+  <p class="form-instructions">Classification names must:</p>
+  <ul class="requirements-list">
+    <li>Contain only letters and numbers (no spaces or special characters)</li>
+    <li>Not be empty</li>
+    <li>Be unique (not already exist in the database)</li>
+  </ul>
+
+  <form id="addClassForm" action="/inv/add-classification" method="post">
+    <div class="form-group">
+      <label for="classification_name">Classification Name:</label>
+      <input 
+        type="text" 
+        id="classification_name" 
+        name="classification_name" 
+        required
+        pattern="[a-zA-Z0-9]+"
+        value="<%= locals.classification_name %>"
+        oninvalid="this.setCustomValidity('Please enter a valid classification name using only letters and numbers')"
+        oninput="this.setCustomValidity('')"
+      >
+      <div class="validation-feedback"></div>
+    </div>
+    <div class="form-group">
+      <input type="submit" value="Add Classification" class="submit-btn">
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
+
+<style>
+.form-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #2d3e50;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  color: white;
+}
+
+.form-instructions {
+  color: white;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.requirements-list {
+  color: #ddd;
+  margin-bottom: 2rem;
+  padding-left: 1.5rem;
+}
+
+.requirements-list li {
+  margin-bottom: 0.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.1em;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  font-size: 1rem;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+}
+
+.form-group input:valid {
+  border-color: #4CAF50;
+}
+
+.form-group input:invalid {
+  border-color: #ff6b6b;
+}
+
+.validation-feedback {
+  font-size: 0.9em;
+  margin-top: 0.5rem;
+  min-height: 1.5em;
+}
+
+.submit-btn {
+  width: auto;
+  padding: 0.75rem 2rem;
+  background-color: white;
+  color: #2d3e50;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: block;
+  margin: 0 auto;
+  font-weight: bold;
+}
+
+.submit-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.notice {
+  background-color: #ff6b6b;
+  color: white;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  list-style-type: none;
+}
+
+.notice li {
+  margin-bottom: 0.5rem;
+}
+
+.notice li:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .form-container {
+    margin: 1rem;
+    padding: 1rem;
+  }
+}
+</style>
+
+<script>
+document.getElementById('classification_name').addEventListener('input', function(e) {
+  const input = e.target;
+  const feedback = input.parentElement.querySelector('.validation-feedback');
+  
+  if (input.validity.valid) {
+    feedback.textContent = '✓ Valid classification name';
+    feedback.style.color = '#4CAF50';
+  } else {
+    feedback.textContent = 'Classification name must contain only letters and numbers';
+    feedback.style.color = '#ff6b6b';
+  }
+});
+</script> 
