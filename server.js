@@ -11,11 +11,36 @@ const app = express()
 const static = require("./routes/static")
 const expressLayouts = require("express-ejs-layouts")
 const baseController = require("./controllers/baseController")
-const utilities = require("./utilities")
+const utilities = require("./utilities/")
+const session = require("express-session")
+const pool = require('./database/')
+const inventoryRoute = require("./routes/inventoryRoute")
 
 /* ***********************
  * Middleware
  *************************/
+app.use(session({
+  store: new (require('connect-pg-simple')(session))({
+    createTableIfMissing: true,
+    pool,
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true,
+  name: 'sessionId',
+}))
+
+// Express Messages Middleware
+app.use(require('connect-flash')())
+app.use(function(req, res, next){
+  res.locals.messages = require('express-messages')(req, res)
+  next()
+})
+
+// Body Parser Middleware
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
 app.use(static)
 
 app.set("view engine", "ejs")
@@ -32,6 +57,9 @@ app.get("/", utilities.handleErrors(baseController.buildHome))
 
 // Inventory routes
 app.use("/inv", require("./routes/inventoryRoute"))
+
+// Account routes
+app.use("/account", require("./routes/accountRoute"))
 
 // Add error route
 app.use("/", require("./routes/errorRoute"))
