@@ -19,7 +19,7 @@
 <div class="form-container">
   <p class="form-instructions">Classification names must:</p>
   <ul class="requirements-list">
-    <li>Contain only letters and numbers (no spaces or special characters)</li>
+    <li>Contain only CAPITAL LETTERS (no numbers, spaces, or special characters)</li>
     <li>Not be empty</li>
     <li>Be unique (not already exist in the database)</li>
   </ul>
@@ -32,9 +32,9 @@
         id="classification_name" 
         name="classification_name" 
         required
-        pattern="[a-zA-Z0-9]+"
+        pattern="[A-Z]+"
         value="<%= locals.classification_name %>"
-        oninvalid="this.setCustomValidity('Please enter a valid classification name using only letters and numbers')"
+        oninvalid="this.setCustomValidity('Please enter a valid classification name using only capital letters')"
         oninput="this.setCustomValidity('')"
       >
       <div class="validation-feedback"></div>
@@ -166,7 +166,7 @@ document.getElementById('classification_name').addEventListener('input', functio
     feedback.textContent = '✓ Valid classification name';
     feedback.style.color = '#4CAF50';
   } else {
-    feedback.textContent = 'Classification name must contain only letters and numbers';
+    feedback.textContent = 'Classification name must contain only capital letters';
     feedback.style.color = '#ff6b6b';
   }
 });

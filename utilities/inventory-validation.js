@@ -9,13 +9,13 @@ const validate = {}
  * ********************************* */
 validate.classificationRules = () => {
     return [
-        // classification_name is required and must be string
+        // classification_name is required and must be string of capital letters only
         body("classification_name")
         .trim()
         .isLength({ min: 1 })
         .withMessage("Please provide a classification name.") // on error this message is sent
-        .matches(/^[a-zA-Z0-9]+$/)
-        .withMessage("Classification name must contain only alphanumeric characters.")
+        .matches(/^[A-Z]+$/)
+        .withMessage("Classification name must contain only capital letters.")
         .custom(async (classification_name) => {
             const classificationExists = await invModel.checkExistingClassification(classification_name)
             if (classificationExists){
@@ -79,6 +79,12 @@ validate.inventoryRules = () => {
         .isNumeric()
         .withMessage("Please provide valid mileage."),
 
+        // inv_color is required
+        body("inv_color")
+        .trim()
+        .isLength({ min: 1 })
+        .withMessage("Please provide a vehicle color."),
+
         // classification_id is required and must exist in database
         body("classification_id")
         .trim()
@@ -93,6 +99,18 @@ validate.inventoryRules = () => {
 validate.checkClassificationData = async (req, res, next) => {
     const { classification_name } = req.body
     let errors = validationResult(req)
+
+    // Server-side check for capital letters only
+    const capitalLettersOnly = /^[A-Z]+$/.test(classification_name)
+    if (!capitalLettersOnly) {
+        errors = {
+            isEmpty: () => false,
+            array: () => [{
+                msg: "Server: Classification name must contain only capital letters."
+            }]
+        }
+    }
+
     if (!errors.isEmpty()) {
         let nav = await utilities.getNav()
         res.render("inventory/add-classification", {

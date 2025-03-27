@@ -23,6 +23,7 @@
     <li>Year must be a 4-digit number</li>
     <li>Price must be a valid number (decimals allowed)</li>
     <li>Miles must be a valid number (no commas or spaces)</li>
+    <li>Color must not be empty</li>
     <li>Description must not be empty</li>
     <li>Image paths must be valid URLs or file paths</li>
   </ul>
@@ -134,6 +135,18 @@
         required
         min="0"
         value="<%= locals.inv_miles %>"
+      >
+      <div class="validation-feedback"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="inv_color">Color:</label>
+      <input 
+        type="text" 
+        id="inv_color" 
+        name="inv_color" 
+        required
+        value="<%= locals.inv_color %>"
       >
       <div class="validation-feedback"></div>
     </div>

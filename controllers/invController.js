@@ -22,15 +22,25 @@ invCont.buildManagement = async function (req, res, next) {
 invCont.buildByClassification = async function (req, res, next) {
   const classification_id = req.params.classificationId
   const data = await invModel.getInventoryByClassification(classification_id)
-  const grid = await utilities.buildClassificationGrid(data)
   let nav = await utilities.getNav()
-  const className = data[0].classification_name
-  res.render("./inventory/classification", {
-    title: className + " vehicles",
-    nav,
-    grid,
-    footer: true
-  })
+  let grid
+  if(data.length > 0) {
+    grid = await utilities.buildClassificationGrid(data)
+    const className = data[0].classification_name
+    res.render("./inventory/classification", {
+      title: className + " vehicles",
+      nav,
+      grid,
+      footer: true
+    })
+  } else {
+    res.render("./inventory/classification", {
+      title: "No Vehicles Found",
+      nav,
+      grid: "<p class='notice'>Sorry, no vehicles could be found.</p>",
+      footer: true
+    })
+  }
 }
 
 /* ***************************
@@ -119,6 +129,7 @@ invCont.addInventory = async function (req, res) {
     inv_thumbnail,
     inv_price,
     inv_miles,
+    inv_color,
     classification_id,
   } = req.body
 
@@ -132,6 +143,7 @@ invCont.addInventory = async function (req, res) {
       inv_thumbnail,
       inv_price,
       inv_miles,
+      inv_color,
       classification_id
     )
 
@@ -161,6 +173,7 @@ invCont.addInventory = async function (req, res) {
         inv_thumbnail,
         inv_price,
         inv_miles,
+        inv_color,
         classification_id,
         footer: true
       })
@@ -181,6 +194,7 @@ invCont.addInventory = async function (req, res) {
       inv_thumbnail,
       inv_price,
       inv_miles,
+      inv_color,
       classification_id,
       footer: true
     })
