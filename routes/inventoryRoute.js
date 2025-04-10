@@ -14,6 +14,9 @@ router.get("/type/:classificationId", utilities.handleErrors(invController.build
 // Route to build inventory detail view
 router.get("/detail/:inventoryId", utilities.handleErrors(invController.buildByInventoryId))
 
+// Route to get inventory as JSON
+router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON))
+
 // Route to build add classification form
 router.get("/add-classification", utilities.handleErrors(invController.buildAddClassification))
 
