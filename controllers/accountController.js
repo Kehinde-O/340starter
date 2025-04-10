@@ -1,6 +1,8 @@
 const utilities = require("../utilities")
 const accountModel = require("../models/account-model")
 const { comparePassword } = require("../utilities/password-utilities")
+const jwt = require("jsonwebtoken")
+require("dotenv").config()
 const accountController = {}
 
 /* ****************************************
@@ -89,37 +91,35 @@ accountController.registerAccount = async function(req, res) {
 
 /* ****************************************
 *  Process login request
-* *************************************** */
+* ************************************ */
 accountController.accountLogin = async function(req, res) {
   let nav = await utilities.getNav()
   const { account_email, account_password } = req.body
-
+  const accountData = await accountModel.getAccountByEmail(account_email)
+  if (!accountData) {
+    req.flash("notice", "Please check your credentials and try again.")
+    res.status(400).render("account/login", {
+      title: "Login",
+      nav,
+      errors: null,
+      account_email,
+      footer: true
+    })
+    return
+  }
   try {
-    const account = await accountModel.getAccountByEmail(account_email)
-    
-    if (!account) {
-      req.flash("notice", "Please check your credentials and try again.")
-      res.status(400).render("account/login", {
-        title: "Login",
-        nav,
-        errors: null,
-        account_email,
-        footer: true
-      })
-      return
-    }
-
-    const passwordMatch = await comparePassword(account_password, account.account_password)
-
-    if (passwordMatch) {
-      // Store user data in session
-      req.session.account_data = {
-        account_id: account.account_id,
-        account_firstname: account.account_firstname,
-        account_type: account.account_type,
+    ////Having issues with bcrypt, so I seperated it in another utility to test bcrypt or bcryptjs. my code was failing with bcrypt
+    if (await comparePassword(account_password, accountData.account_password)) {
+      delete accountData.account_password
+      const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 })
+      if(process.env.NODE_ENV === 'development') {
+        res.cookie("jwt", accessToken, { httpOnly: true, maxAge: 3600 * 1000 })
+      } else {
+        res.cookie("jwt", accessToken, { httpOnly: true, secure: true, maxAge: 3600 * 1000 })
       }
-      res.redirect("/account/")
-    } else {
+      return res.redirect("/account/")
+    }
+    else {
       req.flash("notice", "Please check your credentials and try again.")
       res.status(400).render("account/login", {
         title: "Login",
@@ -130,16 +130,21 @@ accountController.accountLogin = async function(req, res) {
       })
     }
   } catch (error) {
-    console.error("Login error:", error)
-    req.flash("notice", "Sorry, there was an error processing the login.")
-    res.status(500).render("account/login", {
-      title: "Login",
-      nav,
-      errors: null,
-      account_email,
-      footer: true
-    })
+    throw new Error('Access Forbidden')
   }
+}
+
+/* ****************************************
+*  Deliver account management view
+* *************************************** */
+accountController.buildAccountManagement = async function(req, res, next) {
+  let nav = await utilities.getNav()
+  res.render("account/management", {
+    title: "Account Management",
+    nav,
+    errors: null,
+    footer: true
+  })
 }
 
 module.exports = accountController 

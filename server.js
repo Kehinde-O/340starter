@@ -15,6 +15,7 @@ const utilities = require("./utilities/")
 const session = require("express-session")
 const pool = require('./database/')
 const inventoryRoute = require("./routes/inventoryRoute")
+const cookieParser = require("cookie-parser")
 
 /* ***********************
  * Middleware
@@ -40,6 +41,12 @@ app.use(function(req, res, next){
 // Body Parser Middleware
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+// Cookie Parser Middleware
+app.use(cookieParser())
+
+// JWT Token Middleware
+app.use(utilities.checkJWTToken)
 
 app.use(static)
 

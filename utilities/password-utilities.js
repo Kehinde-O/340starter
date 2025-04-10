@@ -3,15 +3,26 @@ const bcrypt = require("bcryptjs")
 /* *****************************
 *   Hash password
 * *************************** */
-function hashPassword(password) {
-    return bcrypt.hashSync(password, 10)
+async function hashPassword(password) {
+    try {
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        return hashedPassword;
+    } catch (error) {
+        console.log("Error in hashPassword function");
+        throw error;
+    }
 }
 
 /* *****************************
 *   Compare password
 * *************************** */
-function comparePassword(password, hashedPassword) {
-    return bcrypt.compareSync(password, hashedPassword)
+async function comparePassword(password, hashedPassword) {
+    try {
+        return await bcrypt.compare(password, hashedPassword)
+    } catch (error) {
+        throw new Error("Access Forbidden");
+    }
 }
 
 module.exports = { hashPassword, comparePassword } 

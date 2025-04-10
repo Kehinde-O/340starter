@@ -1,0 +1,116 @@
+<%- include('../partials/head') %>
+
+<% if (title) { %>
+  <h1><%= title %></h1>
+<% } else {
+  res.redirect('/')
+} %>
+
+<%- messages() %>
+
+<% if (errors) { %>
+  <ul class="notice">
+    <% errors.array().forEach(error => { %>
+      <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<div class="management-container">
+  <% if (locals.accountData) { %>
+    <h2>Welcome <%= accountData.account_firstname %></h2>
+    <p>You're logged in.</p>
+    
+    <% if (accountData.account_type === 'Admin' || accountData.account_type === 'Employee') { %>
+      <div class="admin-options">
+        <h3>Management Options</h3>
+        <ul>
+          <li><a href="/inv/">Inventory Management</a></li>
+        </ul>
+      </div>
+    <% } %>
+  <% } else { %>
+    <p>You must <a href="/account/login">login</a> to access this page.</p>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>
+
+<style>
+.management-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #2d3e50;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  color: white;
+}
+
+.management-container h2 {
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-options {
+  margin-top: 2rem;
+  background-color: rgba(255,255,255,0.1);
+  padding: 1.5rem;
+  border-radius: 4px;
+}
+
+.admin-options h3 {
+  margin-top: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.admin-options ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.admin-options li {
+  margin-bottom: 0.5rem;
+}
+
+.admin-options a {
+  color: white;
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem;
+  background-color: rgba(255,255,255,0.2);
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.admin-options a:hover {
+  background-color: rgba(255,255,255,0.3);
+}
+
+.notice {
+  background-color: #ff6b6b;
+  color: white;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  list-style-type: none;
+}
+
+.notice li {
+  margin-bottom: 0.5rem;
+}
+
+.notice li:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .management-container {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+}
+</style> 
