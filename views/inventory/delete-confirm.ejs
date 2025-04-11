@@ -1,0 +1,140 @@
+<%- include('../partials/head') %>
+
+<% if (title) { %>
+  <h1><%= title %></h1>
+<% } else {
+  res.redirect('/')
+} %>
+
+<%- messages() %>
+
+<% if (errors) { %>
+  <ul class="notice">
+    <% errors.array().forEach(error => { %>
+      <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<div class="form-container">
+  <p class="form-instructions">Confirm Deletion - The delete is permanent.</p>
+
+  <form id="deleteForm" action="/inv/delete" method="post">
+    <div class="form-group">
+      <label for="inv_make">Make:</label>
+      <input 
+        type="text" 
+        id="inv_make" 
+        name="inv_make" 
+        readonly
+        value="<%= locals.inv_make %>"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="inv_model">Model:</label>
+      <input 
+        type="text" 
+        id="inv_model" 
+        name="inv_model" 
+        readonly
+        value="<%= locals.inv_model %>"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="inv_year">Year:</label>
+      <input 
+        type="number" 
+        id="inv_year" 
+        name="inv_year" 
+        readonly
+        value="<%= locals.inv_year %>"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="inv_price">Price:</label>
+      <input 
+        type="number" 
+        id="inv_price" 
+        name="inv_price" 
+        readonly
+        value="<%= locals.inv_price %>"
+      >
+    </div>
+
+    <div class="form-group">
+      <input type="hidden" name="inv_id" <% if(locals.inv_id) { %> value="<%= locals.inv_id %>" <% } %>>
+      <input type="submit" value="Delete Vehicle" class="delete-btn">
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
+
+<style>
+.form-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #2d3e50;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  color: white;
+}
+
+.form-instructions {
+  color: #ff6b6b;
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+  font-size: 1.2em;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.1em;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  font-size: 1rem;
+  background: #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.delete-btn {
+  width: auto;
+  padding: 0.75rem 2rem;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: inline-block;
+  text-align: center;
+}
+
+.delete-btn:hover {
+  background-color: #ff3333;
+}
+
+@media (max-width: 768px) {
+  .form-container {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+}
+</style> 

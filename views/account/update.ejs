@@ -1,0 +1,195 @@
+<%- include('../partials/head') %>
+
+<% if (title) { %>
+  <h1><%= title %></h1>
+<% } else {
+  res.redirect('/')
+} %>
+
+<%- messages() %>
+
+<% if (errors) { %>
+  <ul class="notice">
+    <% errors.array().forEach(error => { %>
+      <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<div class="update-container">
+  <section class="update-account">
+    <h2>Account Information</h2>
+    <p class="instruction">Update your account information below.</p>
+    
+    <form id="updateForm" action="/account/update" method="post">
+      <div class="form-group">
+        <label for="account_firstname">First Name:</label>
+        <input type="text" id="account_firstname" name="account_firstname" required value="<%= locals.account_firstname %>">
+      </div>
+      
+      <div class="form-group">
+        <label for="account_lastname">Last Name:</label>
+        <input type="text" id="account_lastname" name="account_lastname" required value="<%= locals.account_lastname %>">
+      </div>
+      
+      <div class="form-group">
+        <label for="account_email">Email Address:</label>
+        <input type="email" id="account_email" name="account_email" required value="<%= locals.account_email %>">
+      </div>
+      
+      <input type="hidden" name="account_id" value="<%= locals.account_id %>">
+      
+      <div class="form-group">
+        <input type="submit" class="submit-btn" value="Update Account">
+      </div>
+    </form>
+  </section>
+  
+  <section class="change-password">
+    <h2>Change Password</h2>
+    <p class="instruction">Enter a new password to change your current password. Password must be at least 8 characters and contain at least 1 uppercase letter, 1 number, and 1 special character.</p>
+    
+    <form id="passwordForm" action="/account/update-password" method="post">
+      <div class="form-group">
+        <label for="account_password">New Password:</label>
+        <input type="password" id="account_password" name="account_password" required 
+               pattern="^(?=.*\d)(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,}$">
+        <span class="password-requirements">Must contain at least 8 characters, 1 uppercase letter, 1 number, and 1 special character</span>
+      </div>
+      
+      <input type="hidden" name="account_id" value="<%= locals.account_id %>">
+      
+      <div class="form-group">
+        <input type="submit" class="submit-btn" value="Change Password">
+      </div>
+    </form>
+  </section>
+</div>
+
+<%- include('../partials/footer') %>
+
+<style>
+.update-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.update-account, .change-password {
+  flex: 1;
+  min-width: 300px;
+  background-color: #2d3e50;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  padding: 2rem;
+  color: white;
+}
+
+h2 {
+  margin-top: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.instruction {
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  font-size: 1rem;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76,175,80,0.2);
+}
+
+.password-requirements {
+  display: block;
+  font-size: 0.8rem;
+  color: #ccc;
+  margin-top: 0.5rem;
+}
+
+.submit-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover {
+  background-color: #45a049;
+}
+
+.notice {
+  width: 100%;
+  background-color: #ff6b6b;
+  color: white;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  list-style-type: none;
+}
+
+.notice li {
+  margin-bottom: 0.5rem;
+}
+
+.notice li:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .update-container {
+    flex-direction: column;
+    margin: 1rem;
+    gap: 1rem;
+  }
+
+  .update-account, .change-password {
+    padding: 1.5rem;
+  }
+}
+</style>
+
+<script>
+document.getElementById('account_password').addEventListener('input', function() {
+  const passwordInput = this;
+  const requirementsList = document.querySelector('.password-requirements');
+  
+  if(passwordInput.validity.valid) {
+    requirementsList.style.color = '#4CAF50';
+  } else {
+    requirementsList.style.color = '#ccc';
+  }
+});
+</script> 

@@ -19,14 +19,15 @@
 <div class="management-container">
   <% if (locals.accountData) { %>
     <h2>Welcome <%= accountData.account_firstname %></h2>
-    <p>You're logged in.</p>
+    
+    <div class="account-actions">
+      <a href="/account/update/<%= accountData.account_id %>" class="action-btn">Update Account Information</a>
+    </div>
     
     <% if (accountData.account_type === 'Admin' || accountData.account_type === 'Employee') { %>
       <div class="admin-options">
-        <h3>Management Options</h3>
-        <ul>
-          <li><a href="/inv/">Inventory Management</a></li>
-        </ul>
+        <h3>Inventory Management</h3>
+        <p><a href="/inv/" class="admin-link">Manage Inventory</a></p>
       </div>
     <% } %>
   <% } else { %>
@@ -53,6 +54,25 @@
   margin-bottom: 1.5rem;
 }
 
+.account-actions {
+  margin: 2rem 0;
+}
+
+.action-btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #4CAF50;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+  background-color: #3e8e41;
+}
+
 .admin-options {
   margin-top: 2rem;
   background-color: rgba(255,255,255,0.1);
@@ -67,26 +87,17 @@
   margin-bottom: 1rem;
 }
 
-.admin-options ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-.admin-options li {
-  margin-bottom: 0.5rem;
-}
-
-.admin-options a {
+.admin-link {
   color: white;
   text-decoration: none;
-  display: block;
-  padding: 0.5rem;
+  display: inline-block;
+  padding: 0.5rem 1rem;
   background-color: rgba(255,255,255,0.2);
   border-radius: 4px;
   transition: background-color 0.2s;
 }
 
-.admin-options a:hover {
+.admin-link:hover {
   background-color: rgba(255,255,255,0.3);
 }
 
