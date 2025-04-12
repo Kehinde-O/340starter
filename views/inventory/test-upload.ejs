@@ -3,17 +3,8 @@
 <div class="test-upload-container">
   <h1>Test Image Upload</h1>
   
-  <% if (messages().success) { %>
-    <div class="flash-success">
-      <p><%= messages().success %></p>
-    </div>
-  <% } %>
-  
-  <% if (messages().notice) { %>
-    <div class="flash-notice">
-      <p><%= messages().notice %></p>
-    </div>
-  <% } %>
+  <!-- Simple flash message display like login page -->
+  <%- messages() %>
   
   <div class="test-upload-form">
     <h2>Simple Test Upload</h2>
@@ -38,6 +29,14 @@
     <a href="/inv" class="back-link">Back to Inventory Management</a>
   </div>
 </div>
+
+<% if (errors) { %>
+  <ul class="notice">
+    <% errors.array().forEach(error => { %>
+      <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+<% } %>
 
 <style>
   .test-upload-container {
@@ -74,20 +73,38 @@
     cursor: pointer;
   }
   
-  .flash-success {
-    background-color: #d4edda;
-    color: #155724;
-    padding: 10px;
+  /* Flash message styles from login page */
+  .info, .success, .notice, .error {
+    padding: 15px 20px;
+    margin-bottom: 25px;
     border-radius: 5px;
-    margin-bottom: 15px;
+    font-weight: bold;
+    border-left: 8px solid;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
   
-  .flash-notice {
+  .info {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    border-color: #2196f3;
+  }
+  
+  .success {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: #28a745;
+  }
+  
+  .notice, .error {
     background-color: #f8d7da;
     color: #721c24;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 15px;
+    border-color: #dc3545;
+  }
+  
+  .info p, .success p, .notice p, .error p {
+    margin: 0;
+    font-size: 1.2em;
+    line-height: 1.4;
   }
   
   .management-links {

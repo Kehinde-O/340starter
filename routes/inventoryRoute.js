@@ -46,21 +46,54 @@ const fileFilter = (req, file, cb) => {
   }
   
   // Create more detailed error message
-  const actualType = file.mimetype || path.extname(file.originalname) || 'unknown type'
-  req.fileValidationError = `File type rejected: ${actualType}. Only JPG, JPEG, PNG, and GIF files are allowed.`
+  const fileExtension = path.extname(file.originalname).toLowerCase() || 'unknown';
+  const errorMessage = `Invalid file format: ${fileExtension}. Please upload a JPG, JPEG, PNG, or GIF image.`;
+  
   console.log("File validation failed:", {
     filename: file.originalname,
     mimetype: file.mimetype,
-    extension: path.extname(file.originalname)
+    extension: path.extname(file.originalname),
+    error: errorMessage
   })
-  return cb(null, false)
+  
+  // Store the error directly on the request object
+  req.fileValidationError = errorMessage
+  
+  // Return with false to reject the file
+  return cb(null, false, new Error(errorMessage))
 }
 
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 1024 * 1024 * 5 }, // 5MB file size limit
+  limits: { 
+    fileSize: 1024 * 1024 * 5, // 5MB file size limit
+  },
   fileFilter: fileFilter
 })
+
+// Error handling middleware for multer uploads
+const handleUploadError = (req, res, next) => {
+  return (err) => {
+    console.error("Upload middleware error:", err);
+    const inventory_id = req.body.inventory_id;
+    
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        req.flash("notice", "File size exceeds the 5MB limit. Please choose a smaller file.");
+      } else {
+        req.flash("notice", `Upload error: ${err.code} - ${err.message}`);
+      }
+    } else if (err) {
+      req.flash("notice", `Upload error: ${err.message}`);
+    }
+    
+    if (inventory_id) {
+      return res.redirect(`/inv/images/${inventory_id}`);
+    } else {
+      return res.redirect("/inv");
+    }
+  };
+};
 
 // Route to build management view - Protected
 router.get("/", utilities.checkJWTToken, utilities.checkAccountType, utilities.handleErrors(invController.buildManagement))
@@ -146,41 +179,40 @@ router.post(
   utilities.checkAccountType,
   (req, res, next) => {
     upload.single('vehicle_image')(req, res, (err) => {
+      // Get the inventory_id from the form data for redirects
+      const inventory_id = req.body.inventory_id
+      
+      // Handle Multer errors (like file size)
       if (err) {
-        // Handle Multer errors
+        console.log("Multer error during upload:", err);
         if (err instanceof multer.MulterError) {
-          // A Multer error occurred when uploading
           if (err.code === 'LIMIT_FILE_SIZE') {
-            req.flash("notice", "File size exceeds the 5MB limit")
+            req.flash("error", "The uploaded file is too large. Please upload an image under 5MB.")
           } else {
-            req.flash("notice", `Upload error: ${err.message}`)
+            req.flash("error", `Upload error: ${err.message}`)
           }
         } else {
-          // An unknown error occurred
-          req.flash("notice", `Upload error: ${err.message}`)
+          req.flash("error", `Upload error: ${err.message}`)
         }
-        
-        // Get the inventory_id from the form data
-        const inventory_id = req.body.inventory_id
         return res.redirect(`/inv/images/${inventory_id}`)
       }
       
-      // Handle file validation error
+      // Check for file validation error (invalid type)
       if (req.fileValidationError) {
-        console.log("Setting flash for file validation error:", req.fileValidationError)
-        req.flash("notice", req.fileValidationError)
-        const inventory_id = req.body.inventory_id
+        console.log("File validation error:", req.fileValidationError)
+        req.flash("error", req.fileValidationError)
         return res.redirect(`/inv/images/${inventory_id}`)
       }
       
       // If no file was selected
       if (!req.file) {
-        console.log("No file selected")
+        console.log("No file uploaded")
         req.flash("notice", "Please select a file to upload")
-        const inventory_id = req.body.inventory_id
         return res.redirect(`/inv/images/${inventory_id}`)
       }
       
+      // If we got here, validation passed and we have a file
+      console.log("File validation successful, proceeding to next middleware")
       next()
     })
   },
@@ -203,25 +235,27 @@ router.post(
   (req, res, next) => {
     upload.single('vehicle_image')(req, res, (err) => {
       if (err) {
-        // Handle Multer errors
+        console.log("Multer error during test upload:", err);
         if (err instanceof multer.MulterError) {
           if (err.code === 'LIMIT_FILE_SIZE') {
-            req.flash("notice", "File size exceeds the 5MB limit")
+            req.flash("error", "The uploaded file is too large. Please upload an image under 5MB.")
           } else {
-            req.flash("notice", `Upload error: ${err.message}`)
+            req.flash("error", `Upload error: ${err.message}`)
           }
         } else {
-          req.flash("notice", `Upload error: ${err.message}`)
+          req.flash("error", `Upload error: ${err.message}`)
         }
         return res.redirect("/inv/test-upload-page")
       }
       
-      // Handle file validation error
+      // Check for file validation error (invalid type)
       if (req.fileValidationError) {
-        req.flash("notice", req.fileValidationError)
+        console.log("File validation error:", req.fileValidationError)
+        req.flash("error", req.fileValidationError)
         return res.redirect("/inv/test-upload-page")
       }
       
+      // If we got here, validation passed
       next()
     })
   },
@@ -234,7 +268,7 @@ router.post(
     try {
       if (!req.file) {
         console.log("No file in test upload")
-        req.flash("notice", "No file selected")
+        req.flash("notice", "Please select a file to upload")
         return res.redirect("/inv/test-upload-page")
       }
       
@@ -243,7 +277,7 @@ router.post(
       res.redirect("/inv/test-upload-page")
     } catch (error) {
       console.error("Test upload error:", error)
-      req.flash("notice", "Error: " + error.message)
+      req.flash("error", "Error: " + error.message)
       res.redirect("/inv/test-upload-page")
     }
   })
