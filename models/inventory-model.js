@@ -163,6 +163,36 @@ async function deleteInventoryItem(inv_id) {
   }
 }
 
+/* ***************************
+ *  Get all inventory items
+ * ************************** */
+async function getAllInventory() {
+  try {
+    const data = await pool.query(
+      `SELECT * FROM public.inventory ORDER BY inv_id`
+    )
+    return data.rows
+  } catch (error) {
+    console.error("getAllInventory error: " + error)
+    throw error
+  }
+}
+
+/* ***************************
+ *  Update inventory table with primary image
+ * ************************** */
+async function updateInventoryImage(inventory_id, image_path) {
+  try {
+    const sql = 
+      "UPDATE inventory SET inv_image = $1, inv_thumbnail = $1 WHERE inv_id = $2 RETURNING *"
+    const data = await pool.query(sql, [image_path, inventory_id])
+    return data.rows[0]
+  } catch (error) {
+    console.error("Error in updateInventoryImage:", error)
+    throw error
+  }
+}
+
 module.exports = {
   getClassifications,
   getInventoryByClassification,
@@ -172,4 +202,6 @@ module.exports = {
   addInventory,
   updateInventory,
   deleteInventoryItem,
+  getAllInventory,
+  updateInventoryImage,
 }

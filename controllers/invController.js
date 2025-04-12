@@ -1,5 +1,6 @@
 const invModel = require("../models/inventory-model")
 const utilities = require("../utilities/")
+const imageController = require("../controllers/imageController")
 
 const invCont = {}
 
@@ -200,6 +201,9 @@ invCont.buildByInventoryId = async function (req, res, next) {
       next(err)
       return
     }
+
+    // Ensure backward compatibility with the image system
+    await imageController.ensureBackwardCompatibility(inventory_id)
 
     let nav = await utilities.getNav()
     const title = `${vehicle.inv_year} ${vehicle.inv_make} ${vehicle.inv_model}`

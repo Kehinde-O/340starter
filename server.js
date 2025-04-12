@@ -45,6 +45,18 @@ app.use(express.urlencoded({ extended: true }))
 // Cookie Parser Middleware
 app.use(cookieParser())
 
+// Request Logger Middleware for debugging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} | ${req.method} ${req.url}`);
+  if (req.method === 'POST' && req.url.includes('/images/upload')) {
+    console.log('Image Upload Request Details:');
+    console.log('Headers:', req.headers);
+    console.log('Body:', req.body);
+    console.log('Files:', req.files);
+  }
+  next();
+});
+
 // JWT Token Middleware
 app.use(utilities.checkJWTToken)
 
@@ -109,4 +121,27 @@ const host = process.env.HOST
  *************************/
 app.listen(port, () => {
   console.log(`app listening on ${host}:${port}`)
+  
+  // Ensure all required tables exist
+  try {
+    const { ensureInventoryImagesTable, ensureReviewsTable } = require('./database/ensure-tables')
+    
+    Promise.all([
+      ensureInventoryImagesTable(),
+      ensureReviewsTable()
+    ])
+      .then(results => {
+        const allSuccessful = results.every(success => success);
+        if (allSuccessful) {
+          console.log("Database tables verified")
+        } else {
+          console.warn("Database table verification failed, some features may not work correctly")
+        }
+      })
+      .catch(err => {
+        console.error("Error verifying database tables:", err)
+      })
+  } catch (error) {
+    console.error("Error importing table verification module:", error)
+  }
 })

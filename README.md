@@ -45,3 +45,29 @@ When you installed Git and cloned the remote repository in week 1, you should ha
 1. Go to http://localhost:5500 in a browser tab. Nothing should be visible as the server has not been setup to repond to that route.
 2. Add "/filename.html" to the end of the URL (replacing filename with the name of the file you moved to the public folder).
 3. You should see that page in the browser.
+
+## Image Management System Backward Compatibility
+
+The application includes a new Image Management System that allows multiple images per inventory item. For backward compatibility with the existing inventory data, the following features were implemented:
+
+### Automatic Migration
+
+The system automatically migrates original inventory images to the new image system when:
+1. Viewing a vehicle detail page
+2. Using the image management interface for a specific vehicle
+3. Accessing images via the API
+
+This on-demand migration ensures that existing vehicle listings continue to display correctly without requiring manual intervention.
+
+### Admin Migration Tool
+
+Administrators have access to a bulk migration tool:
+1. Navigate to Inventory Management
+2. Click the "Migrate All Images" button (visible only to Admin users)
+3. Confirm the action when prompted
+
+This tool will process all inventory items and migrate their original images to the new system in a single operation, setting each as the primary image for its respective vehicle.
+
+### Fallback Mechanism
+
+The front-end includes a fallback mechanism that will display the original image from the inventory table if the new image system fails to provide images. This ensures that vehicles always display with at least one image, even in case of system errors.

@@ -3,6 +3,19 @@
 <div class="vehicle-container">
   <h1><%= vehicle.inv_year %> <%= vehicle.inv_make %> <%= vehicle.inv_model %></h1>
   
+  <!-- Add flash message display -->
+  <% if (messages().success) { %>
+    <div class="flash-message flash-success">
+      <p><%= messages().success %></p>
+    </div>
+  <% } %>
+  
+  <% if (messages().notice) { %>
+    <div class="flash-message flash-notice">
+      <p><%= messages().notice %></p>
+    </div>
+  <% } %>
+  
   <div class="vehicle-detail">
     <div class="vehicle-image">
       <img src="<%= vehicle.inv_image %>" alt="Image of <%= vehicle.inv_year %> <%= vehicle.inv_make %> <%= vehicle.inv_model %>">
@@ -14,6 +27,15 @@
       <div class="detail-item">
         <h3>Price:</h3>
         <p class="price">$<%= new Intl.NumberFormat('en-US').format(vehicle.inv_price) %></p>
+      </div>
+      
+      <div id="rating-container" class="detail-item">
+        <h3>Rating:</h3>
+        <div class="stars-container">
+          <div class="stars"></div>
+          <span class="rating-value"></span>
+          <span class="rating-count"></span>
+        </div>
       </div>
       
       <div class="detail-item description">
@@ -32,6 +54,59 @@
       </div>
     </div>
   </div>
+  
+  <% if (locals.accountData && (locals.accountData.account_type === 'Admin' || locals.accountData.account_type === 'Employee')) { %>
+    <div class="admin-actions">
+      <a href="/inv/edit/<%= vehicle.inv_id %>" class="button">Edit Vehicle</a>
+      <a href="/inv/delete/<%= vehicle.inv_id %>" class="button delete">Delete Vehicle</a>
+      <a href="/inv/images/<%= vehicle.inv_id %>" class="button">Manage Images</a>
+    </div>
+  <% } %>
+  
+  <!-- Reviews Section -->
+  <section class="reviews-section">
+    <h2>Customer Reviews</h2>
+    
+    <div id="average-rating" class="average-rating">
+      <!-- Average rating will be displayed here -->
+    </div>
+    
+    <% if (locals.accountData) { %>
+      <div id="review-form-container" class="review-form-container">
+        <h3>Write a Review</h3>
+        <form action="/inv/reviews/add" method="POST" class="review-form">
+          <input type="hidden" name="inventory_id" value="<%= vehicle.inv_id %>">
+          
+          <div class="form-group">
+            <label for="rating">Rating:</label>
+            <select name="rating" id="rating" required>
+              <option value="5">★★★★★ (Excellent)</option>
+              <option value="4">★★★★☆ (Very Good)</option>
+              <option value="3">★★★☆☆ (Good)</option>
+              <option value="2">★★☆☆☆ (Fair)</option>
+              <option value="1">★☆☆☆☆ (Poor)</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="review_text">Your Review:</label>
+            <textarea name="review_text" id="review_text" rows="4" minlength="5" maxlength="1000" required></textarea>
+            <div class="character-count"><span id="char-count">0</span>/1000 characters</div>
+          </div>
+          
+          <button type="submit" class="submit-button">Submit Review</button>
+        </form>
+      </div>
+    <% } else { %>
+      <div class="login-prompt">
+        <p>Please <a href="/account/login">log in</a> to leave a review.</p>
+      </div>
+    <% } %>
+    
+    <div id="reviews-container" class="reviews-container">
+      <!-- Reviews will be loaded here -->
+    </div>
+  </section>
 </div>
 
 <% if (errors) { %>
@@ -49,6 +124,32 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+}
+
+/* Flash message styles */
+.flash-message {
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-weight: bold;
+  border-left: 5px solid;
+}
+
+.flash-success {
+  background-color: #d4edda;
+  color: #155724;
+  border-color: #28a745;
+}
+
+.flash-notice {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-color: #dc3545;
+}
+
+.flash-message p {
+  margin: 0;
+  font-size: 1.1em;
 }
 
 .vehicle-container h1 {
@@ -169,4 +270,496 @@
     margin-bottom: 5px;
   }
 }
-</style> 
+
+/* Admin Actions */
+.admin-actions {
+  margin-top: 30px;
+  display: flex;
+  gap: 15px;
+}
+
+.button {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #4a90e2;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.button:hover {
+  background-color: #357ac7;
+}
+
+.button.delete {
+  background-color: #e74c3c;
+}
+
+.button.delete:hover {
+  background-color: #c0392b;
+}
+
+/* Reviews Section Styles */
+.reviews-section {
+  margin-top: 40px;
+  padding: 30px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.reviews-section h2 {
+  font-size: 1.8em;
+  color: #333;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.average-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.stars-container {
+  display: flex;
+  align-items: center;
+}
+
+.stars {
+  color: #f39c12;
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.rating-count {
+  color: #7f8c8d;
+  margin-left: 10px;
+}
+
+.review-form-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.review-form-container h3 {
+  font-size: 1.4em;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #333;
+}
+
+.form-group select,
+.form-group textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.character-count {
+  font-size: 0.8em;
+  color: #7f8c8d;
+  text-align: right;
+  margin-top: 5px;
+}
+
+.submit-button {
+  padding: 10px 20px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.submit-button:hover {
+  background-color: #357ac7;
+}
+
+.login-prompt {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-prompt a {
+  color: #4a90e2;
+  font-weight: bold;
+}
+
+.reviews-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.reviewer {
+  font-weight: bold;
+  color: #333;
+}
+
+.review-date {
+  color: #7f8c8d;
+  font-size: 0.9em;
+}
+
+.review-rating {
+  color: #f39c12;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.review-text {
+  color: #333;
+  line-height: 1.6;
+}
+
+.review-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.review-actions button {
+  padding: 5px 10px;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.review-actions button:hover {
+  background-color: #f8f9fa;
+}
+
+.review-actions .delete {
+  color: #e74c3c;
+}
+
+.review-actions .edit {
+  color: #4a90e2;
+}
+
+@media (max-width: 768px) {
+  .reviews-section {
+    padding: 15px;
+  }
+}
+
+/* Debug styles */
+.debug-info {
+  background-color: #e3f2fd;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  border-left: 5px solid #2196f3;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.debug-review {
+  background-color: #fff3e0;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  border: 1px solid #ffe0b2;
+  overflow: auto;
+}
+
+.debug-review pre {
+  margin: 0;
+  font-family: monospace;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM fully loaded - initializing vehicle detail page scripts');
+  const vehicleId = <%= vehicle.inv_id %>;
+  console.log('Vehicle ID:', vehicleId);
+
+  // Initialize UI elements
+  const avgEl = document.getElementById('average-rating');
+  const starsEl = document.querySelector('.stars'); // Main rating stars
+  const ratingValueEl = document.querySelector('.rating-value');
+  const ratingCountEl = document.querySelector('.rating-count');
+  const reviewsContainer = document.getElementById('reviews-container');
+  const ratingContainer = document.getElementById('rating-container'); // The whole rating section header
+  const reviewFormContainer = document.getElementById('review-form-container');
+
+  if (!avgEl || !reviewsContainer || !ratingContainer) {
+    console.error('Missing required DOM elements for reviews');
+    return;
+  }
+
+  // Load reviews
+  console.log('Fetching reviews from:', `/inv/reviews/${vehicleId}`);
+  fetch(`/inv/reviews/${vehicleId}`)
+    .then(response => {
+      console.log('Review fetch response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Reviews data received:', data);
+
+      // Clear any previous content
+      reviewsContainer.innerHTML = '';
+
+      if (data.reviews && data.reviews.length > 0) {
+        ratingContainer.style.display = 'flex'; // Show rating header
+
+        const totalReviews = data.reviews.length;
+        const reviewText = totalReviews === 1 ? 'review' : 'reviews';
+
+        // Display average rating in the header
+        const averageRating = parseFloat(data.averageRating) || 0;
+        const fullStars = Math.floor(averageRating);
+        const hasHalfStar = averageRating % 1 >= 0.5;
+
+        if (starsEl && ratingValueEl && ratingCountEl) {
+          starsEl.innerHTML = '★'.repeat(fullStars) + (hasHalfStar ? '½' : '') + '☆'.repeat(5 - fullStars - (hasHalfStar ? 1 : 0));
+          ratingValueEl.textContent = averageRating.toFixed(1); 
+          // Use dynamic count for header rating
+          ratingCountEl.textContent = `(${totalReviews} ${reviewText})`; 
+        }
+
+        // Create stars for average rating section below the reviews section title
+        // Use dynamic count for average rating display
+        avgEl.innerHTML = ` 
+          <div class="stars">${'★'.repeat(fullStars)}${hasHalfStar ? '½' : ''}${'☆'.repeat(5 - fullStars - (hasHalfStar ? 1 : 0))}</div>
+          <div class="avg-rating-text">${averageRating.toFixed(1)} out of 5</div>
+          <div class="review-count">(${totalReviews} ${reviewText})</div>
+        `;
+
+        let currentUserReview = null;
+        let otherReviews = [...data.reviews]; // Create a copy
+
+        <% if (locals.accountData) { %>
+          const accountId = <%= locals.accountData.account_id %>;
+          const userReviewIndex = otherReviews.findIndex(review => review.account_id === accountId);
+
+          if (userReviewIndex > -1) {
+            currentUserReview = otherReviews.splice(userReviewIndex, 1)[0]; // Remove and get user's review
+
+            if (reviewFormContainer) {
+              // Remove the H3 title from here
+              reviewFormContainer.innerHTML = ` 
+                <div class="user-review review">
+                  <div class="review-header">
+                    <span class="reviewer">Your review</span> 
+                    <span class="review-date">${new Date(currentUserReview.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <div class="review-rating">${'★'.repeat(currentUserReview.rating)}${'☆'.repeat(5 - currentUserReview.rating)}</div>
+                  <p class="review-text">${currentUserReview.review_text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+                  <div class="review-actions">
+                    <button class="edit" onclick="editReview(${currentUserReview.review_id}, ${currentUserReview.rating}, '${currentUserReview.review_text.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')">Edit</button>
+                    <form action="/inv/reviews/delete" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete your review?')">
+                      <input type="hidden" name="review_id" value="${currentUserReview.review_id}">
+                      <input type="hidden" name="inventory_id" value="${vehicleId}">
+                      <button type="submit" class="delete">Delete</button>
+                    </form>
+                  </div>
+                </div>
+              `;
+            }
+          }
+        <% } %>
+
+        // Display remaining reviews (otherReviews)
+        if (otherReviews.length > 0) {
+            console.log(`Displaying ${otherReviews.length} other reviews.`);
+            displayReviews(otherReviews, reviewsContainer);
+        } else if (!currentUserReview) {
+            // Only show this if there were no reviews fetched at all
+            reviewsContainer.innerHTML = '<p>No reviews yet for this vehicle.</p>';
+        } else {
+             // If only the current user's review existed, add a message
+             reviewsContainer.innerHTML = '<p>No other customer reviews yet.</p>';
+        }
+
+      } else {
+        // No reviews yet - handle UI state
+        avgEl.innerHTML = '<p>No reviews yet. Be the first to review this vehicle!</p>';
+        reviewsContainer.innerHTML = ''; // Ensure review container is empty
+        if (ratingContainer) {
+          ratingContainer.style.display = 'none'; // Hide rating header if no reviews
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error loading reviews:', error);
+      avgEl.innerHTML = '<p>Unable to load reviews. Please try again later.</p>';
+      // Make sure reviewsContainer is defined before trying to set innerHTML
+      if (reviewsContainer) {
+        reviewsContainer.innerHTML = '<div class="error-message">Error loading reviews: ' + error.message + '</div>';
+      }
+      if (ratingContainer) ratingContainer.style.display = 'none';
+    });
+
+  // Character counter for review text
+  const reviewText = document.getElementById('review_text');
+  const charCount = document.getElementById('char-count');
+
+  if (reviewText && charCount) {
+    reviewText.addEventListener('input', function() {
+      charCount.textContent = this.value.length;
+    });
+    // Initial count
+    charCount.textContent = reviewText.value.length;
+  }
+});
+
+// Function to display reviews
+function displayReviews(reviews, container) {
+  console.log(`Inside displayReviews, received ${reviews.length} reviews to display.`); // Add log
+  const normalReviewsWrapper = document.createElement('div');
+  normalReviewsWrapper.className = 'normal-reviews';
+
+  if (reviews.length === 0) {
+     // This case should ideally be handled before calling displayReviews,
+     // but added as a safeguard.
+     console.log("displayReviews called with 0 reviews.");
+     normalReviewsWrapper.innerHTML = '<p>No other reviews found.</p>';
+  } else {
+      reviews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); // Sort by most recent first
+
+      reviews.forEach(review => {
+        const reviewEl = document.createElement('div');
+        reviewEl.classList.add('review');
+
+        const safeReviewText = review.review_text
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+
+        reviewEl.innerHTML = `
+          <div class="review-header">
+            <span class="reviewer">${review.account_firstname} ${review.account_lastname}</span>
+            <span class="review-date">${new Date(review.created_at).toLocaleDateString()}</span>
+          </div>
+          <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+          <p class="review-text">${safeReviewText}</p>
+        `;
+        normalReviewsWrapper.appendChild(reviewEl);
+      });
+  }
+  // Append the wrapper containing all reviews to the main container
+  // Make sure this doesn't clear previously added content if needed (like user's own review)
+  container.appendChild(normalReviewsWrapper); 
+}
+
+// Function to handle edit review
+function editReview(reviewId, rating, reviewText) {
+  const container = document.getElementById('review-form-container');
+  if (!container) return; // Should not happen, but safety check
+
+  const currentScroll = window.scrollY;
+
+  // Replace escaped newlines back to actual newlines for textarea
+  const editText = reviewText.replace(/\\n/g, "\n");
+
+  container.innerHTML = `
+    <h3>Edit Your Review</h3>
+    <form action="/inv/reviews/update" method="POST" class="review-form">
+      <input type="hidden" name="review_id" value="${reviewId}">
+      <input type="hidden" name="inventory_id" value="<%= vehicle.inv_id %>">
+
+      <div class="form-group">
+        <label for="edit-rating">Rating:</label>
+        <select name="rating" id="edit-rating" required>
+          <option value="5" ${rating === 5 ? 'selected' : ''}>★★★★★ (Excellent)</option>
+          <option value="4" ${rating === 4 ? 'selected' : ''}>★★★★☆ (Very Good)</option>
+          <option value="3" ${rating === 3 ? 'selected' : ''}>★★★☆☆ (Good)</option>
+          <option value="2" ${rating === 2 ? 'selected' : ''}>★★☆☆☆ (Fair)</option>
+          <option value="1" ${rating === 1 ? 'selected' : ''}>★☆☆☆☆ (Poor)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-review_text">Your Review:</label>
+        <textarea name="review_text" id="edit-review_text" rows="4" minlength="5" maxlength="1000" required>${editText}</textarea>
+        <div class="character-count"><span id="edit-char-count">${editText.length}</span>/1000 characters</div>
+      </div>
+
+      <div class="form-actions" style="display: flex; gap: 10px;">
+        <button type="submit" class="submit-button">Update Review</button>
+        <button type="button" onclick="cancelEdit()" class="cancel-button" style="background-color: #7f8c8d;">Cancel</button>
+      </div>
+    </form>
+  `;
+
+  // Re-initialize character counter for edit form
+  const reviewTextEdit = document.getElementById('edit-review_text');
+  const charCountEdit = document.getElementById('edit-char-count');
+
+  if (reviewTextEdit && charCountEdit) {
+    reviewTextEdit.addEventListener('input', function() {
+      charCountEdit.textContent = this.value.length;
+    });
+     // Ensure initial count is set correctly after populating textarea
+     charCountEdit.textContent = reviewTextEdit.value.length;
+  }
+
+  // Scroll to the edit form
+  container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // Attempt to restore scroll position after potential reflow
+  setTimeout(() => window.scrollTo(0, currentScroll), 100);
+}
+
+// Function to cancel edit
+function cancelEdit() {
+  // Reload the page to cancel editing and show the original review display
+  window.location.reload();
+}
+</script>

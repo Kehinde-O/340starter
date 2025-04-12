@@ -14,6 +14,9 @@
   <div class="management-links">
     <a href="/inv/add-classification" class="management-btn">Add New Classification</a>
     <a href="/inv/add-inventory" class="management-btn">Add New Vehicle</a>
+    <% if (locals.accountData && locals.accountData.account_type === 'Admin') { %>
+      <a href="/inv/admin/migrate-images" class="management-btn admin-btn" onclick="return confirm('This will migrate all original inventory images to the new image system. Continue?')">Migrate All Images</a>
+    <% } %>
   </div>
   
   <h2>Manage Inventory</h2>
@@ -69,6 +72,15 @@ h2 {
 
 .management-btn:hover {
   background-color: #f0f0f0;
+}
+
+.management-btn.admin-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.management-btn.admin-btn:hover {
+  background-color: #c0392b;
 }
 
 .instructions {
